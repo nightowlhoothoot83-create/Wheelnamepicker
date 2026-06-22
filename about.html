@@ -25,7 +25,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904958390525375" crossorigin="anonymous"></script>
+
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -116,7 +116,7 @@ footer{border-top:1px solid rgba(240,192,64,.15);padding:48px 20px 28px;backgrou
   <h1>About Wheel Name Picker</h1>
 
   <ins class="adsbygoogle" style="display:block;margin-bottom:32px" data-ad-client="ca-pub-1904958390525375" data-ad-slot="7308800071" data-ad-format="auto" data-full-width-responsive="true"></ins>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  <script>try{(adsbygoogle = window.adsbygoogle || []).push({});}catch(e){}</script>
 
   <p>Wheel Name Picker is a free online random spinner designed for Australian teachers, students, families and anyone who needs a fair, transparent and fun way to make a decision or run a competition.</p>
 
@@ -192,7 +192,7 @@ footer{border-top:1px solid rgba(240,192,64,.15);padding:48px 20px 28px;backgrou
   </div>
 
   <ins class="adsbygoogle" style="display:block;margin-top:24px" data-ad-client="ca-pub-1904958390525375" data-ad-slot="7308800071" data-ad-format="auto" data-full-width-responsive="true"></ins>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  <script>try{(adsbygoogle = window.adsbygoogle || []).push({});}catch(e){}</script>
 </div>
 
 <footer>
@@ -209,7 +209,7 @@ footer{border-top:1px solid rgba(240,192,64,.15);padding:48px 20px 28px;backgrou
       <a href="https://mycalendartools.net" target="_blank" rel="noopener" class="foot-brand-item"><img src="logo-mycalendartools.png" alt="MyCalendarTools"/><span>MyCalendarTools</span></a>
       <a href="https://mysticalmoments.pages.dev" target="_blank" rel="noopener" class="foot-brand-item"><img src="logo-mystical-moments.png" alt="Mystical Moments"/><span>Mystical Moments</span></a>
       <a href="https://zyiacreations.etsy.com" target="_blank" rel="noopener" class="foot-brand-item"><img src="logo-zyia-creations.png" alt="Zyia Creations"/><span>Zyia Creations</span></a>
-      <a href="https://ravensharp.netlify.app" target="_blank" rel="noopener" class="foot-brand-item"><img src="logo-raven-sharp.png" alt="Raven Sharp"/><span>Raven Sharp</span></a>
+      <a href="https://ravensharp.com.au" target="_blank" rel="noopener" class="foot-brand-item"><img src="logo-raven-sharp.png" alt="Raven Sharp"/><span>Raven Sharp</span></a>
       <a href="https://www.facebook.com/share/18UReUHqdB/" target="_blank" rel="noopener" class="foot-brand-item"><img src="logo-feed-the-feed.png" alt="Feed the Feed"/><span>Feed the Feed</span></a>
       <a href="https://youtube.com/@spewcrewkids" target="_blank" rel="noopener" class="foot-brand-item"><img src="logo-spew-crew-kids.png" alt="Spew Crew Kids"/><span>Spew Crew Kids</span></a>
       <a href="https://ascensiondigitalgroup.com" target="_blank" rel="noopener" class="foot-brand-item"><img src="logo-ascension-digital.png" alt="Ascension Digital Group"/><span>ADG Hub</span></a>
@@ -229,5 +229,47 @@ footer{border-top:1px solid rgba(240,192,64,.15);padding:48px 20px 28px;backgrou
   </div>
 </footer>
 
+
+<style>
+.cookie-consent-banner{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#1a1a2e;border-top:1px solid rgba(255,255,255,0.12);box-shadow:0 -4px 24px rgba(0,0,0,0.3);padding:16px 20px;display:none;font-family:'Nunito',sans-serif}
+.cookie-consent-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.cookie-consent-inner p{font-size:0.85rem;color:#cfcfe0;margin:0;flex:1;min-width:240px}
+.cookie-consent-inner a{color:#7ad1ff;text-decoration:underline}
+.cookie-consent-actions{display:flex;gap:10px;flex-shrink:0}
+.cookie-consent-actions button{white-space:nowrap;padding:9px 20px;font-size:0.85rem;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-family:'Nunito',sans-serif}
+.cc-accept{background:#6c5ce7;color:#fff}
+.cc-decline{background:rgba(255,255,255,0.1);color:#fff}
+@media(max-width:640px){.cookie-consent-inner{flex-direction:column;align-items:stretch}.cookie-consent-actions{justify-content:stretch}.cookie-consent-actions button{flex:1}}
+</style>
+<div id="cookie-consent-banner" class="cookie-consent-banner">
+  <div class="cookie-consent-inner">
+    <p>We use cookies for basic site functionality and to show ads via Google AdSense. Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this or other websites. See our <a href="cookies.html">Cookie Policy</a> for details.</p>
+    <div class="cookie-consent-actions">
+      <button class="cc-decline" onclick="ccDecline()">Decline</button>
+      <button class="cc-accept" onclick="ccAccept()">Accept</button>
+    </div>
+  </div>
+</div>
+<script>
+function ccLoadAdsense(){
+  if(document.getElementById('adsbygoogle-script'))return;
+  var s=document.createElement('script');
+  s.id='adsbygoogle-script';s.async=true;
+  s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1904958390525375';
+  s.crossOrigin='anonymous';
+  document.head.appendChild(s);
+}
+function ccAccept(){localStorage.setItem('cookieConsent','accepted');document.getElementById('cookie-consent-banner').style.display='none';ccLoadAdsense();}
+function ccDecline(){localStorage.setItem('cookieConsent','declined');document.getElementById('cookie-consent-banner').style.display='none';}
+(function(){
+  var choice=localStorage.getItem('cookieConsent');
+  if(choice==='accepted'){ccLoadAdsense();}
+  else if(choice!=='declined'){
+    document.addEventListener('DOMContentLoaded',function(){
+      document.getElementById('cookie-consent-banner').style.display='block';
+    });
+  }
+})();
+</script>
 </body>
 </html>
