@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta name="description" content="Free random choice and winner picker tools. Spin a wheel, flip a coin, roll dice or generate random numbers for classrooms, raffles, chores, meals, games and everyday choices."/>
 <meta name="keywords" content="wheel spinner, random name picker, classroom spinner, teacher tool, random picker australia, name wheel, spin the wheel, random game picker, competition wheel, prize draw, raffle wheel, weekday picker, random number generator, colour picker, classroom games, party games, teacher resources australia, decision maker, random selector, school activities, giveaway picker, team picker, group selector, random day picker, what to eat spinner, venue picker, activity wheel, brain break games, student picker, cold call tool, chore wheel, family games, random choice maker, fair picker, equal chance, classroom management, engagement tool, coin flip online, coin toss online free, online dice roller, roll a dice online, lotto number generator australia, lucky dip generator, random lotto numbers, pick lotto numbers online, quick pick lotto, chore picker for kids, homework picker, random picker for kids, picture wheel spinner, spin the wheel with photos"/>
-<title>Free Wheel Spinner & Random Name Picker | Wheel Name Picker</title>
+<title>Free Wheel Spinner &amp; Random Name Picker</title>
 
 <!-- Open Graph -->
 <meta property="og:title" content="Wheel Name Picker — Free Random Spinner, Dice Roller, Coin Flip & Lotto Numbers"/>
@@ -356,6 +356,7 @@ footer{background:var(--surf);border-top:1px solid rgba(240,192,64,.15);padding:
 </head>
 <body>
 
+<header>
 <div class="rs-raven-strip">
   <a href="https://raven-sharp.com" target="_blank" rel="noopener" class="rs-raven-strip-link">
     <img src="logo-raven-sharp.png" alt="Raven Sharp">
@@ -382,12 +383,19 @@ footer{background:var(--surf);border-top:1px solid rgba(240,192,64,.15);padding:
     <a href="https://mycalctools.net" class="nav-badge" target="_blank" rel="noopener">More Free Tools ↗</a>
   </div>
 </nav>
+</header>
 
 <!-- HERO -->
+<main>
 <div class="hero" id="spinner">
   <img src="logo.png" alt="Wheel Name Picker" class="hero-logo" onerror="this.style.display='none'"/>
   <h1>Free Random Choice &amp; Winner Picker Tools<br/><span>Pick a Name, Number, Winner, Task or Activity</span></h1>
   <p>Choose fairly between everyday options with a wheel spinner, coin flip, dice roller and random number picker. No account, download or payment is required — choose a tool and generate a result instantly.</p>
+  <form class="site-search" id="siteSearchForm" role="search" style="max-width:680px;margin:24px auto 18px">
+    <label for="siteSearch" style="display:block;font-weight:800;margin-bottom:8px">Find the right random tool</label>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><input id="siteSearch" name="q" type="search" placeholder="Try names, raffle, dice, chores or numbers" autocomplete="off" style="min-width:280px;flex:1;padding:12px 14px;border-radius:10px;border:1px solid var(--bdr);background:var(--surf);color:var(--text)"><button type="submit" class="mini-btn lotto-btn" style="font-size:14px;padding:11px 18px">Search tools</button></div>
+    <p id="siteSearchResults" aria-live="polite" style="margin-top:10px"></p>
+  </form>
   <div class="mode-pills" id="modePills"></div>
 </div>
 
@@ -691,6 +699,7 @@ footer{background:var(--surf);border-top:1px solid rgba(240,192,64,.15);padding:
 </div>
 
 <!-- FOOTER -->
+</main>
 <footer>
   <div class="foot-inner">
 
@@ -762,6 +771,24 @@ footer{background:var(--surf);border-top:1px solid rgba(240,192,64,.15);padding:
 
 <script>
 // ── HELPERS ───────────────────────────────────────────────────────────────────
+const searchableTools = [
+  {terms:'names students teams winner raffle chores meals tasks activities wheel spinner', label:'Wheel Name Picker', url:'#spinner'},
+  {terms:'coin heads tails two choices yes no', label:'Coin Toss', url:'coin-toss.html'},
+  {terms:'dice die board game numbered choices classroom maths', label:'Dice Roller', url:'dice-roller.html'},
+  {terms:'numbers lucky dip lotto bingo raffle entry', label:'Random Number Picker', url:'lucky-dip.html'}
+];
+document.getElementById('siteSearchForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+  const query = document.getElementById('siteSearch').value.trim().toLowerCase();
+  const output = document.getElementById('siteSearchResults');
+  if (!query) { output.textContent = 'Enter what you need to choose.'; return; }
+  const words = query.split(/\s+/);
+  const matches = searchableTools.filter(tool => words.some(word => tool.terms.includes(word)));
+  if (matches.length === 1) { window.location.href = matches[0].url; return; }
+  output.innerHTML = matches.length
+    ? 'Suggested tools: ' + matches.map(tool => '<a href="' + tool.url + '">' + tool.label + '</a>').join(' · ')
+    : 'No exact match. Try the <a href="#spinner">wheel</a> for written choices or the <a href="lucky-dip.html">number picker</a> for numbered choices.';
+});
 function scrollToId(id){ document.getElementById(id)?.scrollIntoView({behavior:"smooth", block:"center"}); }
 function selectModeById(id){
   const m = MODES.find(x => x.id === id);
@@ -1685,5 +1712,6 @@ function ccDecline(){localStorage.setItem('cookieConsent','declined');document.g
   }
 })();
 </script>
+<script src="/cookie-consent.js"></script>
 </body>
 </html>
