@@ -1,7 +1,12 @@
 const CANONICAL_HOST = "wheelnamepicker.com.au";
 
 function cleanInternalHref(raw, baseUrl) {
-  if (!raw || /^(?:#|mailto:|tel:|javascript:|data:)/i.test(raw)) return raw;
+  if (!raw || /^(?:#|tel:|javascript:|data:)/i.test(raw)) return raw;
+
+  // Direct mailto links are rewritten by Cloudflare Email Address Obfuscation
+  // into /cdn-cgi/l/email-protection URLs. Route them to the site's real
+  // contact page instead so users and crawlers always get a valid destination.
+  if (/^mailto:/i.test(raw)) return "/contact/";
 
   try {
     const url = new URL(raw, baseUrl);
@@ -18,7 +23,6 @@ function cleanInternalHref(raw, baseUrl) {
       url.pathname = url.pathname.replace(/\.html$/i, "");
     }
 
-    // The contact page is a folder route, so use its actual canonical form.
     if (url.pathname === "/contact") url.pathname = "/contact/";
 
     return `${url.pathname}${url.search}${url.hash}`;
@@ -51,7 +55,7 @@ export default {
     const headers = new Headers(response.headers);
     headers.delete("content-length");
     headers.set("Content-Type", "text/html; charset=utf-8");
-    headers.set("X-ADG-URL-Hygiene", "wheel-clean-v1");
+    headers.set("X-ADG-URL-Hygiene", "wheel-clean-v2");
     return new Response(html, {
       status: response.status,
       statusText: response.statusText,
