@@ -1,0 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+const expected='google.com, pub-1904958390525375, DIRECT, f08c47fec0942fa0';
+const fail=[];const walk=p=>fs.readdirSync(p,{withFileTypes:true}).flatMap(e=>e.name==='.git'?[]:e.isDirectory()?walk(path.join(p,e.name)):e.name.endsWith('.html')?[path.join(p,e.name)]:[]);const files=walk('.');
+for(const file of files){const s=fs.readFileSync(file,'utf8');if(/href=["'][^"']*\.html/i.test(s))fail.push(`${file}: internal .html link`);if(/url:\s*["'][^"']*\.html|location\.href=["'][^"']*\.html/i.test(s))fail.push(`${file}: scripted .html link`);if(!/<link\b[^>]*rel=["']canonical["'][^>]*href=["']https:\/\/wheelnamepicker\.com\.au\//i.test(s))fail.push(`${file}: missing absolute canonical`)}
+if(fs.readFileSync('ads.txt','utf8').trim()!==expected)fail.push('ads.txt: publisher line mismatch');if(/<loc>[^<]*\.html/i.test(fs.readFileSync('sitemap.xml','utf8')))fail.push('sitemap.xml: redirected .html URL');if(fail.length){console.error(fail.join('\n'));process.exit(1)}console.log(`Wheel Name Picker integrity passed (${files.length} HTML files)`);
