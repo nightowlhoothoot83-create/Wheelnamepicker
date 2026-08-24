@@ -6,11 +6,11 @@ const walk=p=>fs.readdirSync(p,{withFileTypes:true}).flatMap(e=>e.name==='.git'?
 const files=walk('.');
 for(const file of files){
   const s=fs.readFileSync(file,'utf8');
-  if(/href=["'][^"']*\.html/i.test(s))fail.push(\`\${file}: internal .html link\`);
-  if(/url:\s*["'][^"']*\.html|location\.href=["'][^"']*\.html/i.test(s))fail.push(\`\${file}: scripted .html link\`);
-  if(!/<link\b[^>]*rel=["']canonical["'][^>]*href=["']https:\/\/wheelnamepicker\.com\.au\//i.test(s))fail.push(\`\${file}: missing absolute canonical\`);
+  if(/href=["'][^"']*\.html/i.test(s))fail.push(`${file}: internal .html link`);
+  if(/url:\s*["'][^"']*\.html|location\.href=["'][^"']*\.html/i.test(s))fail.push(`${file}: scripted .html link`);
+  if(!/<link\b[^>]*rel=["']canonical["'][^>]*href=["']https:\/\/wheelnamepicker\.com\.au\//i.test(s))fail.push(`${file}: missing absolute canonical`);
   const adgLogos=(s.match(/logo-ascension-digital\.png/gi)||[]).length;
-  if(adgLogos>1)fail.push(\`\${file}: duplicate Ascension Digital logo anywhere on page\`);
+  if(adgLogos>1)fail.push(`${file}: duplicate Ascension Digital logo anywhere on page`);
 }
 const home=fs.readFileSync('index.html','utf8');
 if((home.match(/logo-ascension-digital\.png/gi)||[]).length!==1)fail.push('index.html: expected exactly one Ascension Digital logo');
@@ -19,4 +19,4 @@ if(/46 free online calculators/i.test(home))fail.push('index.html: stale MyCalcT
 if(fs.readFileSync('ads.txt','utf8').trim()!==expected)fail.push('ads.txt: publisher line mismatch');
 if(/<loc>[^<]*\.html/i.test(fs.readFileSync('sitemap.xml','utf8')))fail.push('sitemap.xml: redirected .html URL');
 if(fail.length){console.error(fail.join('\\n'));process.exit(1)}
-console.log(\`Wheel Name Picker integrity passed (\${files.length} HTML files)\`);
+console.log(`Wheel Name Picker integrity passed (${files.length} HTML files)`);
