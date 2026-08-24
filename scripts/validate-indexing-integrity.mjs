@@ -12,6 +12,8 @@ for(const file of files){
   const adgLogos=(s.match(/logo-ascension-digital\.png/gi)||[]).length;
   if(adgLogos>1)fail.push(`${file}: duplicate Ascension Digital logo anywhere on page`);
 }
+const worker=fs.readFileSync('_worker.js','utf8');
+if(!worker.includes('endsWith(".wheelnamepicker.pages.dev")'))fail.push('_worker.js: branch preview host allowance missing');
 const home=fs.readFileSync('index.html','utf8');
 if((home.match(/logo-ascension-digital\.png/gi)||[]).length!==1)fail.push('index.html: expected exactly one Ascension Digital logo');
 if(!home.includes('55 free online calculators across 7 categories'))fail.push('index.html: MyCalcTools count must remain 55');
