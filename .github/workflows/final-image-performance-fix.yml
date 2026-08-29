@@ -1,0 +1,94 @@
+name: Final Wheel image optimizer
+
+on:
+  push:
+    branches: [repair/lock-single-adg-logo-20260825]
+    paths:
+      - .github/workflows/final-image-performance-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/lock-single-adg-logo-20260825
+          fetch-depth: 0
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check pillow
+      - name: Create responsive WebP display assets and patch HTML
+        shell: python
+        run: |
+          from pathlib import Path
+          from PIL import Image
+          import re
+
+          root=Path('.')
+          out=root/'assets'/'perf'
+          out.mkdir(parents=True,exist_ok=True)
+          specs={
+            'logo.png':840,
+            'logo-ascension-digital.png':320,
+            'logo-adg-downloads.png':160,
+            'logo-zyia-creations.png':160,
+            'logo-spew-crew-kids.png':160,
+            'logo-mystical-moments.png':160,
+            'logo-mycalctools.png':160,
+            'logo-mycalendartools.png':160,
+            'logo-raven-sharp.png':160,
+            'logo-feed-the-feed.png':160,
+            'ventraip-banner.jpg':1200,
+          }
+          created={}
+          for name,max_dim in specs.items():
+            src=root/name
+            if not src.exists(): continue
+            with Image.open(src) as im:
+              im=im.convert('RGBA' if 'A' in im.getbands() else 'RGB')
+              if max(im.size)>max_dim:
+                scale=max_dim/max(im.size)
+                im=im.resize((max(1,round(im.width*scale)),max(1,round(im.height*scale))),Image.Resampling.LANCZOS)
+              dst=out/(src.stem+'.webp')
+              im.save(dst,'WEBP',quality=88,method=6)
+              created[name]='/'+dst.as_posix()
+
+          for path in root.glob('*.html'):
+            html=path.read_text(encoding='utf-8')
+            # Use optimized display assets everywhere these brand images are rendered.
+            for old,new in created.items():
+              html=html.replace('src="'+old+'"','src="'+new+'"').replace("src='"+old+"'","src='"+new+"'")
+              html=html.replace('src="/'+old+'"','src="'+new+'"').replace("src='/"+old+"'","src='"+new+"'")
+            # Hero/nav Wheel logo: eager, explicit dimensions, high priority for hero.
+            html=re.sub(r'<img([^>]*src=["\']/assets/perf/logo\.webp["\'][^>]*class=["\'][^"\']*hero-logo[^"\']*["\'][^>]*)>',
+                        lambda m:'<img'+m.group(1)+(' width="280" height="420"' if 'width=' not in m.group(1) else '')+(' fetchpriority="high"' if 'fetchpriority=' not in m.group(1) else '')+(' decoding="async"' if 'decoding=' not in m.group(1) else '')+'>',html)
+            html=re.sub(r'<img([^>]*src=["\']/assets/perf/logo\.webp["\'][^>]*)>',
+                        lambda m:m.group(0) if 'hero-logo' in m.group(1) else '<img'+m.group(1)+(' width="29" height="44"' if 'width=' not in m.group(1) else '')+(' decoding="async"' if 'decoding=' not in m.group(1) else '')+'>',html)
+            # All ecosystem/footer display assets are below the main tool.
+            for name,new in created.items():
+              if name=='logo.png': continue
+              escaped=re.escape(new)
+              html=re.sub(r'<img([^>]*src=["\']'+escaped+r'["\'][^>]*)>',
+                          lambda m:'<img'+m.group(1)+(' loading="lazy"' if 'loading=' not in m.group(1) else '')+(' decoding="async"' if 'decoding=' not in m.group(1) else '')+'>',html)
+            if path.name=='index.html':
+              desc='Free wheel spinner and random picker for names, numbers, chores, classrooms and games, plus coin flip, dice roller and lucky-dip tools. No sign-up.'
+              html=re.sub(r'<meta\b[^>]*name=["\']description["\'][^>]*>',f'<meta name="description" content="{desc}">',html,count=1,flags=re.I)
+              if 'href="/assets/perf/logo.webp"' not in html:
+                html=html.replace('</head>','<link rel="preload" as="image" href="/assets/perf/logo.webp" fetchpriority="high">\n</head>',1)
+              # User-requested ADG prominence, preserving footer structure.
+              html=html.replace('</head>','<style>.foot-adg-logo{width:140px!important;height:140px!important;object-fit:contain}</style>\n</head>',1)
+            path.write_text(html,encoding='utf-8')
+
+      - name: Commit optimized Wheel assets
+        run: |
+          git config user.name "adg-final-readiness"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets/perf '*.html'
+          if git diff --cached --quiet; then
+            echo "No changes required"
+          else
+            git commit -m "Optimize Wheel image delivery and LCP asset"
+            git push origin HEAD:repair/lock-single-adg-logo-20260825
+          fi
