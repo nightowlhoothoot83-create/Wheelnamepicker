@@ -1,25 +1,16 @@
 const CANONICAL_HOST = "wheelnamepicker.com.au";
-
-const CLEAN_FILE_ROUTES = new Map([
-  ["/coin-toss", "/coin-toss.html"],
-  ["/dice-roller", "/dice-roller.html"],
-  ["/lucky-dip", "/lucky-dip.html"],
-]);
-const FILE_CLEAN_ROUTES = new Map([...CLEAN_FILE_ROUTES].map(([clean,file]) => [file, clean]));
+const CLEAN_TOOL_ROUTES = new Set(["/coin-toss", "/dice-roller", "/lucky-dip"]);
 
 function cleanInternalHref(raw, baseUrl) {
   if (!raw || /^(?:#|tel:|javascript:|data:)/i.test(raw)) return raw;
   if (/^mailto:/i.test(raw)) return "/contact/";
-
   try {
     const url = new URL(raw, baseUrl);
     const host = url.hostname.toLowerCase().replace(/^www\./, "");
     if (host !== CANONICAL_HOST) return raw;
-
     url.protocol = "https:";
     url.hostname = CANONICAL_HOST;
     url.port = "";
-
     if (/\/index\.html$/i.test(url.pathname)) {
       url.pathname = url.pathname.replace(/\/index\.html$/i, "/");
     } else if (/\.html$/i.test(url.pathname)) {
@@ -27,7 +18,6 @@ function cleanInternalHref(raw, baseUrl) {
     }
     if (url.pathname === "/index") url.pathname = "/";
     if (url.pathname === "/contact") url.pathname = "/contact/";
-
     return `${url.pathname}${url.search}${url.hash}`;
   } catch {
     return raw;
@@ -56,14 +46,12 @@ function fixWheelLogoSizing(html) {
     out = addAttr(out, "decoding", "async");
     return out;
   });
-
   html = html.replace(/<img\b[^>]*src=["'][^"']*(?:\/assets\/perf\/logo\.webp|\/logo\.png)["'][^>]*>/gi, tag => {
     if (/hero-logo/i.test(tag)) return tag;
     let out = removeAttr(removeAttr(tag, "width"), "height");
     out = addAttr(out, "decoding", "async");
     return out;
   });
-
   return html.replace(/<\/head>/i, `<style id="adg-wheel-shell-fix">
 .hero-logo{width:min(160px,55vw)!important;height:auto!important;object-fit:contain!important;aspect-ratio:auto!important}
 .nav-logo img{width:auto!important;height:44px!important;object-fit:contain!important}
@@ -91,14 +79,6 @@ function applyHomepageMetadata(html, pathname) {
   return html;
 }
 
-async function fetchAssetForCleanRoute(request, env, url) {
-  const assetPath = CLEAN_FILE_ROUTES.get(url.pathname);
-  if (!assetPath) return env.ASSETS.fetch(request);
-  const assetUrl = new URL(request.url);
-  assetUrl.pathname = assetPath;
-  return env.ASSETS.fetch(new Request(assetUrl.toString(), request));
-}
-
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -111,16 +91,17 @@ export default {
       return Response.redirect(url.href, 301);
     }
 
-    const cleanForFile = FILE_CLEAN_ROUTES.get(url.pathname);
-    if (cleanForFile) {
+    if (/\.(?:html)$/i.test(url.pathname)) {
       const target = new URL(request.url);
-      target.pathname = cleanForFile;
+      target.pathname = target.pathname.replace(/\/index\.html$/i, "/").replace(/\.html$/i, "");
+      if (target.pathname === "/index") target.pathname = "/";
       return Response.redirect(target.href, 301);
     }
 
-    const response = await fetchAssetForCleanRoute(request, env, url);
+    const response = await env.ASSETS.fetch(request);
     const contentType = response.headers.get("content-type") || "";
-    if (!response.ok || !contentType.includes("text/html")) return response;
+    const isToolHtml = CLEAN_TOOL_ROUTES.has(url.pathname);
+    if (!response.ok || (!contentType.includes("text/html") && !isToolHtml)) return response;
 
     let html = await response.text();
     html = rewriteInternalLinks(html, url.href);
@@ -131,7 +112,7 @@ export default {
     const headers = new Headers(response.headers);
     headers.delete("content-length");
     headers.set("Content-Type", "text/html; charset=utf-8");
-    headers.set("X-ADG-URL-Hygiene", "wheel-clean-v5");
+    headers.set("X-ADG-URL-Hygiene", "wheel-clean-v6");
     headers.set("X-ADG-Visual-Shell", "wheel-shell-fix-v2");
     return new Response(html, { status: response.status, statusText: response.statusText, headers });
   }
