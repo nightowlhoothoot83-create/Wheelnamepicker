@@ -1,11 +1,14 @@
 const CANONICAL_HOST = "wheelnamepicker.com.au";
 
+const CLEAN_FILE_ROUTES = new Map([
+  ["/coin-toss", "/coin-toss.html"],
+  ["/dice-roller", "/dice-roller.html"],
+  ["/lucky-dip", "/lucky-dip.html"],
+]);
+
 function cleanInternalHref(raw, baseUrl) {
   if (!raw || /^(?:#|tel:|javascript:|data:)/i.test(raw)) return raw;
 
-  // Direct mailto links are rewritten by Cloudflare Email Address Obfuscation
-  // into /cdn-cgi/l/email-protection URLs. Route them to the site's real
-  // contact page instead so users and crawlers always get a valid destination.
   if (/^mailto:/i.test(raw)) return "/contact/";
 
   try {
@@ -37,47 +40,39 @@ function rewriteInternalLinks(html, pageUrl) {
   );
 }
 
-function addAttrs(tag, attrs) {
-  let updated = tag;
-  for (const [name, value] of Object.entries(attrs)) {
-    if (!new RegExp(`\\s${name}\\s*=`, "i").test(updated)) {
-      updated = updated.replace(/\s*\/?>(\s*)$/, ` ${name}="${value}">$1`);
-    }
-  }
-  return updated;
+function removeAttr(tag, name) {
+  return tag.replace(new RegExp(`\\s${name}\\s*=\\s*(?:["'][^"']*["']|[^\\s>]+)`, "ig"), "");
 }
 
-function optimizeImages(html) {
-  // The Wheel hero is Lighthouse's LCP image. Keep it eager and give the
-  // browser its intrinsic aspect ratio plus an explicit priority signal.
-  html = html.replace(/<img\b[^>]*src=["']\/?logo\.png["'][^>]*class=["'][^"']*hero-logo[^"']*["'][^>]*>/gi, tag =>
-    addAttrs(tag, { width: "280", height: "420", fetchpriority: "high", decoding: "async" })
-  );
+function addAttr(tag, name, value) {
+  if (new RegExp(`\\s${name}\\s*=`, "i").test(tag)) return tag;
+  return tag.replace(/\s*\/?>(\s*)$/, ` ${name}="${value}">$1`);
+}
 
-  // Reserve space for the compact navigation logo without making it lazy.
-  html = html.replace(/<img\b[^>]*src=["']\/?logo\.png["'][^>]*>/gi, tag => {
-    if (/hero-logo/i.test(tag)) return tag;
-    return addAttrs(tag, { width: "29", height: "44", decoding: "async" });
+function fixWheelLogoSizing(html) {
+  // The previous performance pass baked portrait width/height attributes onto
+  // the optimized logo. Keep the lightweight WebP but let its real aspect
+  // ratio render naturally so the logo cannot be squashed.
+  html = html.replace(/<img\b[^>]*class=["'][^"']*hero-logo[^"']*["'][^>]*>/gi, tag => {
+    let out = removeAttr(removeAttr(tag, "width"), "height");
+    out = addAttr(out, "fetchpriority", "high");
+    out = addAttr(out, "decoding", "async");
+    return out;
   });
 
-  const squareFooterAssets = [
-    "logo-ascension-digital.png", "logo-adg-downloads.png", "logo-zyia-creations.png",
-    "logo-spew-crew-kids.png", "logo-mystical-moments.png", "logo-mycalctools.png",
-    "logo-mycalendartools.png", "logo-raven-sharp.png", "logo-feed-the-feed.png"
-  ];
-  for (const asset of squareFooterAssets) {
-    const escaped = asset.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const re = new RegExp(`<img\\b[^>]*src=["']\\/?${escaped}["'][^>]*>`, "gi");
-    html = html.replace(re, tag => {
-      const size = /logo-ascension-digital\.png/i.test(asset) ? "140" : "52";
-      return addAttrs(tag, { width: size, height: size, loading: "lazy", decoding: "async" });
-    });
-  }
+  html = html.replace(/<img\b[^>]*src=["'][^"']*(?:\/assets\/perf\/logo\.webp|\/logo\.png)["'][^>]*>/gi, tag => {
+    if (/hero-logo/i.test(tag)) return tag;
+    let out = removeAttr(removeAttr(tag, "width"), "height");
+    out = addAttr(out, "decoding", "async");
+    return out;
+  });
 
-  html = html.replace(/<img\b[^>]*src=["']\/?ventraip-banner\.jpg["'][^>]*>/gi, tag =>
-    addAttrs(tag, { width: "770", height: "513", loading: "lazy", decoding: "async" })
-  );
-  return html;
+  return html.replace(/<\/head>/i, `<style id="adg-wheel-shell-fix">
+.hero-logo{height:auto!important;object-fit:contain!important;max-width:min(160px,55vw)!important}
+.nav-logo img{width:auto!important;height:44px!important;object-fit:contain!important}
+.usecase-card,.tool-card,.mini-tool-card,.info-card,.card{background:linear-gradient(145deg,rgba(26,26,46,.96),rgba(18,18,30,.96));border-color:rgba(124,58,237,.28);box-shadow:0 8px 28px rgba(0,0,0,.18),0 0 18px rgba(0,212,232,.05)}
+button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn{box-shadow:0 0 16px rgba(124,58,237,.16)}
+</style>\n</head>`);
 }
 
 function applyHomepageMetadata(html, pathname) {
@@ -85,10 +80,19 @@ function applyHomepageMetadata(html, pathname) {
   const description = "Free wheel spinner and random picker for names, numbers, chores, classrooms and games, plus coin flip, dice roller and lucky-dip tools. No sign-up.";
   html = html.replace(/<meta\b[^>]*name=["']description["'][^>]*>/i,
     `<meta name="description" content="${description}">`);
-  if (!/rel=["']preload["'][^>]*href=["']\/logo\.png["']/i.test(html)) {
-    html = html.replace(/<\/head>/i, `<link rel="preload" as="image" href="/logo.png" fetchpriority="high">\n<style>.foot-adg-logo{width:140px!important;height:140px!important;object-fit:contain}</style>\n</head>`);
+  if (!/rel=["']preload["'][^>]*href=["']\/assets\/perf\/logo\.webp["']/i.test(html)) {
+    html = html.replace(/<\/head>/i, `<link rel="preload" as="image" href="/assets/perf/logo.webp" fetchpriority="high">\n</head>`);
   }
   return html;
+}
+
+async function fetchAssetForCleanRoute(request, env, url) {
+  const assetPath = CLEAN_FILE_ROUTES.get(url.pathname);
+  if (!assetPath) return env.ASSETS.fetch(request);
+
+  const assetUrl = new URL(request.url);
+  assetUrl.pathname = assetPath;
+  return env.ASSETS.fetch(new Request(assetUrl.toString(), request));
 }
 
 export default {
@@ -103,20 +107,20 @@ export default {
       return Response.redirect(url.href, 301);
     }
 
-    const response = await env.ASSETS.fetch(request);
+    const response = await fetchAssetForCleanRoute(request, env, url);
     const contentType = response.headers.get("content-type") || "";
     if (!response.ok || !contentType.includes("text/html")) return response;
 
     let html = await response.text();
     html = rewriteInternalLinks(html, url.href);
     html = applyHomepageMetadata(html, url.pathname);
-    html = optimizeImages(html);
+    html = fixWheelLogoSizing(html);
 
     const headers = new Headers(response.headers);
     headers.delete("content-length");
     headers.set("Content-Type", "text/html; charset=utf-8");
-    headers.set("X-ADG-URL-Hygiene", "wheel-clean-v3");
-    headers.set("X-ADG-Performance-Fix", "wheel-images-v1");
+    headers.set("X-ADG-URL-Hygiene", "wheel-clean-v4");
+    headers.set("X-ADG-Visual-Shell", "wheel-shell-fix-v1");
     return new Response(html, {
       status: response.status,
       statusText: response.statusText,
