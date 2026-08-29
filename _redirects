@@ -12,3 +12,6 @@ http://wheelnamepicker.pages.dev/* https://wheelnamepicker.com.au/:splat 301!
 /lucky-dip.html /lucky-dip 301!
 /privacy.html /privacy 301!
 /terms.html /terms 301!
+/coin-toss /coin-toss.html 200
+/dice-roller /dice-roller.html 200
+/lucky-dip /lucky-dip.html 200
