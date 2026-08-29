@@ -5,10 +5,10 @@ const CLEAN_FILE_ROUTES = new Map([
   ["/dice-roller", "/dice-roller.html"],
   ["/lucky-dip", "/lucky-dip.html"],
 ]);
+const FILE_CLEAN_ROUTES = new Map([...CLEAN_FILE_ROUTES].map(([clean,file]) => [file, clean]));
 
 function cleanInternalHref(raw, baseUrl) {
   if (!raw || /^(?:#|tel:|javascript:|data:)/i.test(raw)) return raw;
-
   if (/^mailto:/i.test(raw)) return "/contact/";
 
   try {
@@ -25,7 +25,7 @@ function cleanInternalHref(raw, baseUrl) {
     } else if (/\.html$/i.test(url.pathname)) {
       url.pathname = url.pathname.replace(/\.html$/i, "");
     }
-
+    if (url.pathname === "/index") url.pathname = "/";
     if (url.pathname === "/contact") url.pathname = "/contact/";
 
     return `${url.pathname}${url.search}${url.hash}`;
@@ -50,9 +50,6 @@ function addAttr(tag, name, value) {
 }
 
 function fixWheelLogoSizing(html) {
-  // The previous performance pass baked portrait width/height attributes onto
-  // the optimized logo. Keep the lightweight WebP but let its real aspect
-  // ratio render naturally so the logo cannot be squashed.
   html = html.replace(/<img\b[^>]*class=["'][^"']*hero-logo[^"']*["'][^>]*>/gi, tag => {
     let out = removeAttr(removeAttr(tag, "width"), "height");
     out = addAttr(out, "fetchpriority", "high");
@@ -68,11 +65,19 @@ function fixWheelLogoSizing(html) {
   });
 
   return html.replace(/<\/head>/i, `<style id="adg-wheel-shell-fix">
-.hero-logo{height:auto!important;object-fit:contain!important;max-width:min(160px,55vw)!important}
+.hero-logo{width:min(160px,55vw)!important;height:auto!important;object-fit:contain!important;aspect-ratio:auto!important}
 .nav-logo img{width:auto!important;height:44px!important;object-fit:contain!important}
-.usecase-card,.tool-card,.mini-tool-card,.info-card,.card{background:linear-gradient(145deg,rgba(26,26,46,.96),rgba(18,18,30,.96));border-color:rgba(124,58,237,.28);box-shadow:0 8px 28px rgba(0,0,0,.18),0 0 18px rgba(0,212,232,.05)}
-button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn{box-shadow:0 0 16px rgba(124,58,237,.16)}
+.usecase-card,.tool-card,.mini-tool-card,.info-card,.card,.panel{background:linear-gradient(145deg,rgba(26,26,46,.96),rgba(18,18,30,.96));border-color:rgba(124,58,237,.28);box-shadow:0 8px 28px rgba(0,0,0,.18),0 0 18px rgba(0,212,232,.05)}
+button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn,.email{box-shadow:0 0 16px rgba(124,58,237,.16)}
 </style>\n</head>`);
+}
+
+function ensureApprovedFooter(html) {
+  if (html.includes('/assets/perf/logo-ascension-digital.webp')) return html;
+  const block = `<div class="foot-adg-header" data-adg-approved-footer="true" style="text-align:center;margin:0 auto 24px">
+<a href="https://ascensiondigitalgroup.com" target="_blank" rel="noopener"><img src="/assets/perf/logo-ascension-digital.webp" alt="Ascension Digital Group" class="foot-adg-logo" loading="lazy" decoding="async" style="max-width:220px;width:100%;height:auto;margin:0 auto 8px;object-fit:contain"></a>
+<p class="foot-adg-tagline">Part of the Ascension Digital Group ecosystem</p></div>`;
+  return html.replace(/<footer\b([^>]*)>/i, `<footer$1>${block}`);
 }
 
 function applyHomepageMetadata(html, pathname) {
@@ -89,7 +94,6 @@ function applyHomepageMetadata(html, pathname) {
 async function fetchAssetForCleanRoute(request, env, url) {
   const assetPath = CLEAN_FILE_ROUTES.get(url.pathname);
   if (!assetPath) return env.ASSETS.fetch(request);
-
   const assetUrl = new URL(request.url);
   assetUrl.pathname = assetPath;
   return env.ASSETS.fetch(new Request(assetUrl.toString(), request));
@@ -107,6 +111,13 @@ export default {
       return Response.redirect(url.href, 301);
     }
 
+    const cleanForFile = FILE_CLEAN_ROUTES.get(url.pathname);
+    if (cleanForFile) {
+      const target = new URL(request.url);
+      target.pathname = cleanForFile;
+      return Response.redirect(target.href, 301);
+    }
+
     const response = await fetchAssetForCleanRoute(request, env, url);
     const contentType = response.headers.get("content-type") || "";
     if (!response.ok || !contentType.includes("text/html")) return response;
@@ -115,16 +126,13 @@ export default {
     html = rewriteInternalLinks(html, url.href);
     html = applyHomepageMetadata(html, url.pathname);
     html = fixWheelLogoSizing(html);
+    html = ensureApprovedFooter(html);
 
     const headers = new Headers(response.headers);
     headers.delete("content-length");
     headers.set("Content-Type", "text/html; charset=utf-8");
-    headers.set("X-ADG-URL-Hygiene", "wheel-clean-v4");
-    headers.set("X-ADG-Visual-Shell", "wheel-shell-fix-v1");
-    return new Response(html, {
-      status: response.status,
-      statusText: response.statusText,
-      headers
-    });
+    headers.set("X-ADG-URL-Hygiene", "wheel-clean-v5");
+    headers.set("X-ADG-Visual-Shell", "wheel-shell-fix-v2");
+    return new Response(html, { status: response.status, statusText: response.statusText, headers });
   }
 };
