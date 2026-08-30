@@ -1,6 +1,6 @@
 const CANONICAL_HOST = "wheelnamepicker.com.au";
 const CLEAN_TOOL_ROUTES = new Set(["/coin-toss", "/dice-roller", "/lucky-dip"]);
-const APPROVED_ADG_LOGO = "/assets/perf/logo-ascension-digital.webp";
+const APPROVED_ADG_LOGO = "https://www.mycalendartools.net/assets/perf/ascension-digital.webp?v=20260830-final";
 
 function cleanInternalHref(raw, baseUrl) {
   if (!raw || /^(?:#|tel:|javascript:|data:)/i.test(raw)) return raw;
