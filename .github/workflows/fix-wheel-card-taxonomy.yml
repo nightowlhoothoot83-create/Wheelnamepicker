@@ -1,0 +1,53 @@
+name: Fix Wheel card taxonomy
+on:
+  push:
+    branches: [repair/final-adsense-visual-mobile-20260830]
+    paths:
+      - scripts/separate_usecases_tools.py
+      - .github/workflows/fix-wheel-card-taxonomy.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/final-adsense-visual-mobile-20260830
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Separate use cases from tool links
+        run: python scripts/separate_usecases_tools.py
+      - name: Verify card semantics and routes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          h=Path('index.html').read_text(encoding='utf-8')
+          assert 'Popular Wheel Use Cases' in h
+          assert 'Other Random Tools' in h
+          assert 'class="tool-shortcut-card" href="/coin-toss"' in h
+          assert 'class="tool-shortcut-card" href="/dice-roller"' in h
+          assert 'class="tool-shortcut-card" href="/lucky-dip"' in h
+          start=h.index('<!-- WHEEL USE CASES:')
+          end=h.index('<!-- OTHER TOOLS:', start)
+          use=h[start:end]
+          assert 'href=' not in use
+          assert "selectModeById('chores')" in use
+          assert "selectModeById('names')" in use
+          assert "selectModeById('custom')" in use
+          assert "location.href" not in use
+          print('PASS: use cases and tool navigation are semantically separate')
+          PY
+      - name: Commit generated repair
+        run: |
+          if git diff --quiet; then
+            echo "No generated changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Separate Wheel use cases from other tool links"
+          git push origin HEAD:repair/final-adsense-visual-mobile-20260830
