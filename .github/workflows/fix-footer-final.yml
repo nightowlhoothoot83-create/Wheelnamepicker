@@ -1,0 +1,36 @@
+name: Fix final Wheel footer
+on:
+  push:
+    branches: [repair/wheel-footer-final-20260830]
+    paths:
+      - scripts/fix_footer_final.py
+      - .github/workflows/fix-footer-final.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/wheel-footer-final-20260830
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/fix_footer_final.py
+      - name: Verify footer repair
+        run: |
+          grep -F 'width:280px!important;max-width:78vw!important;' _worker.js
+          grep -F 'function ensureAdgDownloadsBrand(html)' _worker.js
+          grep -F 'class="adg-downloads-logo"' _worker.js
+          grep -F 'wheel-footer-final-v6' _worker.js
+      - name: Commit repair
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add _worker.js
+          if ! git diff --cached --quiet; then
+            git commit -m 'Restore final Wheel footer branding'
+            git push
+          fi
