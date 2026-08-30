@@ -73,22 +73,11 @@ button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn,.email{box-shadow:0 0 16px
 }
 
 function ensureApprovedFooter(html) {
+  if (/<footer\b/i.test(html)) return html;
   const block = `<div class="foot-adg-header" data-adg-approved-footer="true" style="text-align:center;margin:0 auto 24px">
 <a href="https://ascensiondigitalgroup.com" target="_blank" rel="noopener"><img src="${APPROVED_ADG_LOGO}" alt="Ascension Digital Group" class="foot-adg-logo" loading="lazy" decoding="async"></a>
 <p class="foot-adg-tagline">Part of the Ascension Digital Group ecosystem</p>
-<a href="https://ascensiondigitalgroup.com" target="_blank" rel="noopener" aria-label="ADG Downloads"><img src="${ADG_DOWNLOADS_LOGO}" alt="ADG Downloads" class="adg-downloads-logo" loading="lazy" decoding="async"></a>
 </div>`;
-
-  html = html.replace(/<div\b[^>]*data-adg-approved-footer=["']true["'][\s\S]*?<\/div>/i, "");
-  html = html.replace(/<img\b([^>]*)(?:alt=["']Ascension Digital(?: Group)?["']|class=["'][^"']*(?:foot-adg-logo|ascension-logo)[^"']*["'])([^>]*)>/gi, tag => {
-    let out = tag.replace(/\bsrc=["'][^"']*["']/i, `src="${APPROVED_ADG_LOGO}"`);
-    out = removeAttr(removeAttr(out, "width"), "height");
-    out = addAttr(out, "loading", "lazy");
-    out = addAttr(out, "decoding", "async");
-    return out;
-  });
-
-  if (/<footer\b/i.test(html)) return html.replace(/<footer\b([^>]*)>/i, `<footer$1>${block}`);
   return html.replace(/<\/body>/i, `<footer class="adg-generated-footer">${block}<p>© 2026 wheelnamepicker.com.au · Part of Ascension Digital Group</p></footer>\n</body>`);
 }
 
