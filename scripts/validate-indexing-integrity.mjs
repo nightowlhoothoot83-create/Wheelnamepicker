@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 const expected='google.com, pub-1904958390525375, DIRECT, f08c47fec0942fa0';
 const fail=[];
-const adgLogoPattern=/(?:logo-ascension-digital\.png|assets\/perf\/logo-ascension-digital\.webp|mycalendartools\.net\/assets\/perf\/ascension-digital\.webp)/gi;
+const adgLogoPattern=/(?:assets\/perf\/ascension-digital\.webp|logo-ascension-digital\.png|assets\/perf\/logo-ascension-digital\.webp|mycalendartools\.net\/assets\/perf\/ascension-digital\.webp)/gi;
 const walk=p=>fs.readdirSync(p,{withFileTypes:true}).flatMap(e=>e.name==='.git'?[]:e.isDirectory()?walk(path.join(p,e.name)):e.name.endsWith('.html')?[path.join(p,e.name)]:[]);
 const files=walk('.');
 for(const file of files){
@@ -15,6 +15,8 @@ for(const file of files){
 }
 const worker=fs.readFileSync('_worker.js','utf8');
 if(!worker.includes('endsWith(".wheelnamepicker.pages.dev")'))fail.push('_worker.js: branch preview host allowance missing');
+if(!worker.includes('ensureAdgDownloadsAllPages'))fail.push('_worker.js: ADG Downloads all-page footer guard missing');
+if(!worker.includes('/assets/perf/logo-adg-downloads.webp'))fail.push('_worker.js: approved ADG Downloads asset missing');
 const home=fs.readFileSync('index.html','utf8');
 if((home.match(adgLogoPattern)||[]).length!==1)fail.push('index.html: expected exactly one Ascension Digital logo');
 if(!home.includes('55 free online calculators across 7 categories'))fail.push('index.html: MyCalcTools count must remain 55');
