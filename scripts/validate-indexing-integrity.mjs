@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 const expected='google.com, pub-1904958390525375, DIRECT, f08c47fec0942fa0';
 const fail=[];
-const adgLogoPattern=/(?:logo-ascension-digital\.png|assets\/perf\/logo-ascension-digital\.webp)/gi;
+const adgLogoPattern=/(?:logo-ascension-digital\.png|assets\/perf\/logo-ascension-digital\.webp|mycalendartools\.net\/assets\/perf\/ascension-digital\.webp)/gi;
 const walk=p=>fs.readdirSync(p,{withFileTypes:true}).flatMap(e=>e.name==='.git'?[]:e.isDirectory()?walk(path.join(p,e.name)):e.name.endsWith('.html')?[path.join(p,e.name)]:[]);
 const files=walk('.');
 for(const file of files){
