@@ -1,0 +1,26 @@
+name: Fix Wheel clean visuals
+on:
+  push:
+    branches: [repair/wheel-clean-visual-20260830]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: repair/wheel-clean-visual-20260830
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/fix_clean_visuals.py
+      - name: Commit targeted visual repair
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html _worker.js
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Fix Wheel overlap footer branding and missed card colours"
+          git push
