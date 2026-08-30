@@ -76,9 +76,11 @@ function fixWheelLogoSizing(html) {
 .usecase-card,.tool-card,.mini-tool-card,.info-card,.card,.panel,.related-card{background:linear-gradient(145deg,rgba(26,26,46,.96),rgba(18,18,30,.96))!important;border-color:rgba(124,58,237,.34)!important;box-shadow:0 8px 28px rgba(0,0,0,.18),0 0 18px rgba(0,212,232,.08),0 0 14px rgba(124,58,237,.08)!important}
 .usecase-card:hover,.tool-card:hover,.mini-tool-card:hover,.info-card:hover,.card:hover,.panel:hover,.related-card:hover{border-color:rgba(0,212,232,.46)!important;box-shadow:0 10px 30px rgba(0,0,0,.22),0 0 22px rgba(0,212,232,.12),0 0 18px rgba(124,58,237,.10)!important}
 button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn,.email{box-shadow:0 0 16px rgba(124,58,237,.16)}
-.foot-adg-logo{display:block!important;width:280px!important;max-width:78vw!important;height:auto!important;object-fit:contain!important;border-radius:12px!important;margin:0 auto 20px!important;filter:drop-shadow(0 0 16px rgba(6,214,255,.3))!important}
+.foot-adg-header{width:100%!important;max-width:none!important;text-align:center!important}
+.foot-adg-header a{display:block!important;width:100%!important;max-width:none!important}
+.foot-adg-logo{display:block!important;width:min(440px,92vw)!important;max-width:440px!important;height:auto!important;object-fit:contain!important;border-radius:12px!important;margin:0 auto 20px!important;filter:drop-shadow(0 0 16px rgba(6,214,255,.3))!important}
 .adg-generated-footer{background:#080811;border-top:1px solid rgba(255,255,255,.08);padding:32px 20px;text-align:center;color:#8b89a8}
-@media(max-width:768px){nav,.card,.tool-card,.info-card,.wheel-wrap{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.usecase-card,.tool-card,.mini-tool-card,.info-card,.card,.panel,.related-card{box-shadow:0 6px 18px rgba(0,0,0,.18),0 0 10px rgba(124,58,237,.06)!important}button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn,.email{box-shadow:0 0 10px rgba(124,58,237,.12)}}
+@media(max-width:768px){nav,.card,.tool-card,.info-card,.wheel-wrap{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.usecase-card,.tool-card,.mini-tool-card,.info-card,.card,.panel,.related-card{box-shadow:0 6px 18px rgba(0,0,0,.18),0 0 10px rgba(124,58,237,.06)!important}button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn,.email{box-shadow:0 0 10px rgba(124,58,237,.12)}.foot-adg-logo{width:min(360px,92vw)!important;max-width:360px!important}}
 </style>\n</head>`);
 }
 
@@ -132,7 +134,7 @@ export default {
     headers.delete("content-length");
     headers.set("Content-Type", "text/html; charset=utf-8");
     headers.set("X-ADG-URL-Hygiene", "wheel-clean-v6");
-    headers.set("X-ADG-Visual-Shell", "wheel-footer-single-v7");
+    headers.set("X-ADG-Visual-Shell", "wheel-footer-large-v8");
     return new Response(html, { status: response.status, statusText: response.statusText, headers });
   }
 };
