@@ -84,6 +84,15 @@ button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn,.email{box-shadow:0 0 16px
 </style>\n</head>`);
 }
 
+function ensureAdgDownloadsAllPages(html) {
+  if (/logo-adg-downloads\.webp/i.test(html)) return html;
+  const icon = `<a href="https://ascensiondigitalgroup.com" target="_blank" rel="noopener" title="ADG Downloads" data-adg-downloads="true"><img src="/assets/perf/logo-adg-downloads.webp" alt="ADG Downloads" width="52" height="52" loading="lazy" decoding="async"></a>`;
+  if (/<div\b[^>]*class=["'][^"']*foot-ecosystem[^"']*["'][^>]*>/i.test(html)) return html.replace(/(<div\b[^>]*class=["'][^"']*foot-ecosystem[^"']*["'][^>]*>)/i, `$1${icon}`);
+  if (/<div\b[^>]*class=["'][^"']*foot-links[^"']*["'][^>]*>/i.test(html)) return html.replace(/(<div\b[^>]*class=["'][^"']*foot-links[^"']*["'][^>]*>)/i, `$1${icon}`);
+  if (/<footer\b/i.test(html)) return html.replace(/(<\/footer>)/i, `<div class="foot-adg-downloads" style="display:flex;justify-content:center;margin:18px auto">${icon}</div>$1`);
+  return html;
+}
+
 function ensureApprovedFooter(html) {
   if (/<footer\b/i.test(html)) return html;
   const block = `<div class="foot-adg-header" data-adg-approved-footer="true" style="text-align:center;margin:0 auto 24px">
@@ -129,12 +138,13 @@ export default {
     html = normalizeFooterLogo(html);
     html = fixWheelLogoSizing(html);
     html = ensureApprovedFooter(html);
+    html = ensureAdgDownloadsAllPages(html);
 
     const headers = new Headers(response.headers);
     headers.delete("content-length");
     headers.set("Content-Type", "text/html; charset=utf-8");
     headers.set("X-ADG-URL-Hygiene", "wheel-clean-v6");
-    headers.set("X-ADG-Visual-Shell", "wheel-footer-large-v8");
+    headers.set("X-ADG-Visual-Shell", "wheel-footer-consistent-v9");
     return new Response(html, { status: response.status, statusText: response.statusText, headers });
   }
 };
