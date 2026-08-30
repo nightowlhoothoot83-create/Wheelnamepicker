@@ -77,11 +77,17 @@ function fixWheelLogoSizing(html) {
 .usecase-card,.tool-card,.mini-tool-card,.info-card,.card,.panel,.related-card{background:linear-gradient(145deg,rgba(26,26,46,.96),rgba(18,18,30,.96))!important;border-color:rgba(124,58,237,.34)!important;box-shadow:0 8px 28px rgba(0,0,0,.18),0 0 18px rgba(0,212,232,.08),0 0 14px rgba(124,58,237,.08)!important}
 .usecase-card:hover,.tool-card:hover,.mini-tool-card:hover,.info-card:hover,.card:hover,.panel:hover,.related-card:hover{border-color:rgba(0,212,232,.46)!important;box-shadow:0 10px 30px rgba(0,0,0,.22),0 0 22px rgba(0,212,232,.12),0 0 18px rgba(124,58,237,.10)!important}
 button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn,.email{box-shadow:0 0 16px rgba(124,58,237,.16)}
-.foot-adg-logo{display:block!important;width:220px!important;max-width:70vw!important;height:auto!important;object-fit:contain!important;border-radius:12px!important;margin:0 auto 20px!important;filter:drop-shadow(0 0 16px rgba(6,214,255,.3))!important}
+.foot-adg-logo{display:block!important;width:280px!important;max-width:78vw!important;height:auto!important;object-fit:contain!important;border-radius:12px!important;margin:0 auto 20px!important;filter:drop-shadow(0 0 16px rgba(6,214,255,.3))!important}
 .adg-downloads-logo{display:block!important;width:min(150px,46vw)!important;max-width:150px!important;height:auto!important;object-fit:contain!important;margin:14px auto 8px!important}
 .adg-generated-footer{background:#080811;border-top:1px solid rgba(255,255,255,.08);padding:32px 20px;text-align:center;color:#8b89a8}
 @media(max-width:768px){nav,.card,.tool-card,.info-card,.wheel-wrap{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.usecase-card,.tool-card,.mini-tool-card,.info-card,.card,.panel,.related-card{box-shadow:0 6px 18px rgba(0,0,0,.18),0 0 10px rgba(124,58,237,.06)!important}button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn,.email{box-shadow:0 0 10px rgba(124,58,237,.12)}}
 </style>\n</head>`);
+}
+
+function ensureAdgDownloadsBrand(html) {
+  if (!/<footer\b/i.test(html)) return html;
+  if (/class=["'][^"']*adg-downloads-logo/i.test(html)) return html;
+  return html.replace(/(<p\b[^>]*class=["'][^"']*foot-adg-tagline[^"']*["'][^>]*>[\s\S]*?<\/p>)/i, `$1\n<a class="adg-downloads-link" href="https://ascensiondigitalgroup.com" target="_blank" rel="noopener"><img src="${ADG_DOWNLOADS_LOGO}" alt="ADG Downloads" class="adg-downloads-logo" width="300" height="300" loading="lazy" decoding="async"></a>`);
 }
 
 function ensureApprovedFooter(html) {
@@ -89,6 +95,7 @@ function ensureApprovedFooter(html) {
   const block = `<div class="foot-adg-header" data-adg-approved-footer="true" style="text-align:center;margin:0 auto 24px">
 <a href="https://ascensiondigitalgroup.com" target="_blank" rel="noopener"><img src="${APPROVED_ADG_LOGO}" alt="Ascension Digital Group" class="foot-adg-logo" width="440" height="440" loading="lazy" decoding="async"></a>
 <p class="foot-adg-tagline">Part of the Ascension Digital Group ecosystem</p>
+<a class="adg-downloads-link" href="https://ascensiondigitalgroup.com" target="_blank" rel="noopener"><img src="${ADG_DOWNLOADS_LOGO}" alt="ADG Downloads" class="adg-downloads-logo" width="300" height="300" loading="lazy" decoding="async"></a>
 </div>`;
   return html.replace(/<\/body>/i, `<footer class="adg-generated-footer">${block}<p>© 2026 wheelnamepicker.com.au · Part of Ascension Digital Group</p></footer>\n</body>`);
 }
@@ -127,6 +134,7 @@ export default {
     html = repairToolCardTargets(html);
     html = applyHomepageMetadata(html, url.pathname);
     html = normalizeFooterLogo(html);
+    html = ensureAdgDownloadsBrand(html);
     html = fixWheelLogoSizing(html);
     html = ensureApprovedFooter(html);
 
@@ -134,7 +142,7 @@ export default {
     headers.delete("content-length");
     headers.set("Content-Type", "text/html; charset=utf-8");
     headers.set("X-ADG-URL-Hygiene", "wheel-clean-v6");
-    headers.set("X-ADG-Visual-Shell", "wheel-footer-logo-v5");
+    headers.set("X-ADG-Visual-Shell", "wheel-footer-final-v6");
     return new Response(html, { status: response.status, statusText: response.statusText, headers });
   }
 };
