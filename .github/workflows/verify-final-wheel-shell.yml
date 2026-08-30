@@ -1,0 +1,16 @@
+name: Verify final Wheel shell
+on:
+  push:
+    branches:
+      - repair/final-adsense-visual-mobile-20260830
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify Wheel shell, footer and tool routes
+        run: python scripts/verify_final_wheel_shell.py
