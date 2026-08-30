@@ -1,6 +1,6 @@
 const CANONICAL_HOST = "wheelnamepicker.com.au";
 const CLEAN_TOOL_ROUTES = new Set(["/coin-toss", "/dice-roller", "/lucky-dip"]);
-const APPROVED_ADG_LOGO = "https://www.mycalendartools.net/assets/perf/ascension-digital.webp?v=20260830-final";
+const APPROVED_ADG_LOGO = "/assets/perf/ascension-digital.webp";
 
 function cleanInternalHref(raw, baseUrl) {
   if (!raw || /^(?:#|tel:|javascript:|data:)/i.test(raw)) return raw;
@@ -78,9 +78,9 @@ function fixWheelLogoSizing(html) {
 button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn,.email{box-shadow:0 0 16px rgba(124,58,237,.16)}
 .foot-adg-header{width:100%!important;max-width:none!important;text-align:center!important}
 .foot-adg-header a{display:block!important;width:100%!important;max-width:none!important}
-.foot-adg-logo{display:block!important;width:min(440px,92vw)!important;max-width:440px!important;height:auto!important;object-fit:contain!important;border-radius:12px!important;margin:0 auto 20px!important;filter:drop-shadow(0 0 16px rgba(6,214,255,.3))!important}
+.foot-adg-logo{display:block!important;width:220px!important;max-width:220px!important;max-height:none!important;height:auto!important;object-fit:contain!important;border-radius:12px!important;margin:0 auto 20px!important;filter:drop-shadow(0 0 16px rgba(6,214,255,.3))!important}
 .adg-generated-footer{background:#080811;border-top:1px solid rgba(255,255,255,.08);padding:32px 20px;text-align:center;color:#8b89a8}
-@media(max-width:768px){nav,.card,.tool-card,.info-card,.wheel-wrap{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.usecase-card,.tool-card,.mini-tool-card,.info-card,.card,.panel,.related-card{box-shadow:0 6px 18px rgba(0,0,0,.18),0 0 10px rgba(124,58,237,.06)!important}button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn,.email{box-shadow:0 0 10px rgba(124,58,237,.12)}.foot-adg-logo{width:min(360px,92vw)!important;max-width:360px!important}}
+@media(max-width:768px){nav,.card,.tool-card,.info-card,.wheel-wrap{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.usecase-card,.tool-card,.mini-tool-card,.info-card,.card,.panel,.related-card{box-shadow:0 6px 18px rgba(0,0,0,.18),0 0 10px rgba(124,58,237,.06)!important}button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn,.email{box-shadow:0 0 10px rgba(124,58,237,.12)}.foot-adg-logo{width:min(220px,70vw)!important;max-width:220px!important}}
 </style>\n</head>`);
 }
 
