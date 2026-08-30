@@ -1,0 +1,35 @@
+name: Fix Wheel footer correct Ascension asset
+on:
+  push:
+    branches: [fix/footer-correct-ascension-final]
+    paths:
+      - scripts/fix_footer_correct_asset.py
+      - .github/workflows/fix-footer-correct-asset.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/footer-correct-ascension-final
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/fix_footer_correct_asset.py
+      - name: Verify exact footer-only repair
+        run: |
+          grep -F 'https://www.mycalendartools.net/assets/perf/ascension-digital.webp?v=20260830-final' _worker.js
+          grep -F 'https://www.mycalendartools.net/assets/perf/ascension-digital.webp?v=20260830-final' index.html
+          grep -F 'width:min(280px,78vw)' index.html
+      - name: Commit footer files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add _worker.js index.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'Use Calendar Ascension logo and final Wheel footer size'
+            git push
+          fi
