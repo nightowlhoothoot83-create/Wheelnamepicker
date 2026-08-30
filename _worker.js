@@ -1,5 +1,6 @@
 const CANONICAL_HOST = "wheelnamepicker.com.au";
 const CLEAN_TOOL_ROUTES = new Set(["/coin-toss", "/dice-roller", "/lucky-dip"]);
+const APPROVED_ADG_LOGO = "https://www.mycalendartools.net/assets/perf/ascension-digital.webp";
 
 function cleanInternalHref(raw, baseUrl) {
   if (!raw || /^(?:#|tel:|javascript:|data:)/i.test(raw)) return raw;
@@ -57,14 +58,25 @@ function fixWheelLogoSizing(html) {
 .nav-logo img{width:auto!important;height:44px!important;object-fit:contain!important}
 .usecase-card,.tool-card,.mini-tool-card,.info-card,.card,.panel{background:linear-gradient(145deg,rgba(26,26,46,.96),rgba(18,18,30,.96));border-color:rgba(124,58,237,.28);box-shadow:0 8px 28px rgba(0,0,0,.18),0 0 18px rgba(0,212,232,.05)}
 button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn,.email{box-shadow:0 0 16px rgba(124,58,237,.16)}
+.foot-adg-logo{display:block!important;width:min(220px,72vw)!important;max-width:220px!important;height:auto!important;object-fit:contain!important;margin:0 auto 8px!important}
+@media(max-width:768px){nav,.card,.tool-card,.info-card,.wheel-wrap{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.usecase-card,.tool-card,.mini-tool-card,.info-card,.card,.panel{box-shadow:0 6px 18px rgba(0,0,0,.18),0 0 10px rgba(124,58,237,.06)}button,.mini-btn,.spin-btn,.nav-badge,.rs-support-btn,.email{box-shadow:0 0 10px rgba(124,58,237,.12)}}
 </style>\n</head>`);
 }
 
 function ensureApprovedFooter(html) {
-  if (html.includes('/assets/perf/logo-ascension-digital.webp')) return html;
   const block = `<div class="foot-adg-header" data-adg-approved-footer="true" style="text-align:center;margin:0 auto 24px">
-<a href="https://ascensiondigitalgroup.com" target="_blank" rel="noopener"><img src="/assets/perf/logo-ascension-digital.webp" alt="Ascension Digital Group" class="foot-adg-logo" loading="lazy" decoding="async" style="max-width:220px;width:100%;height:auto;margin:0 auto 8px;object-fit:contain"></a>
+<a href="https://ascensiondigitalgroup.com" target="_blank" rel="noopener"><img src="${APPROVED_ADG_LOGO}" alt="Ascension Digital Group" class="foot-adg-logo" loading="lazy" decoding="async"></a>
 <p class="foot-adg-tagline">Part of the Ascension Digital Group ecosystem</p></div>`;
+
+  html = html.replace(/<div\b[^>]*data-adg-approved-footer=["']true["'][\s\S]*?<\/div>/i, "");
+  html = html.replace(/<img\b([^>]*)(?:alt=["']Ascension Digital(?: Group)?["']|class=["'][^"']*(?:foot-adg-logo|ascension-logo)[^"']*["'])([^>]*)>/gi, tag => {
+    let out = tag.replace(/\bsrc=["'][^"']*["']/i, `src="${APPROVED_ADG_LOGO}"`);
+    out = removeAttr(removeAttr(out, "width"), "height");
+    out = addAttr(out, "loading", "lazy");
+    out = addAttr(out, "decoding", "async");
+    return out;
+  });
+
   return html.replace(/<footer\b([^>]*)>/i, `<footer$1>${block}`);
 }
 
@@ -113,7 +125,7 @@ export default {
     headers.delete("content-length");
     headers.set("Content-Type", "text/html; charset=utf-8");
     headers.set("X-ADG-URL-Hygiene", "wheel-clean-v6");
-    headers.set("X-ADG-Visual-Shell", "wheel-shell-fix-v2");
+    headers.set("X-ADG-Visual-Shell", "wheel-shell-fix-v3");
     return new Response(html, { status: response.status, statusText: response.statusText, headers });
   }
 };
