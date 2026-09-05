@@ -320,15 +320,25 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,18,.95);backdrop-fil
 .tool-card-desc{font-size:12px;color:var(--muted);line-height:1.5}
 .tool-card-tag{margin-top:10px;display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;font-family:var(--ffm);letter-spacing:.1em}
 
-/* VENTRAIP AFFILIATE PANEL */
-.affiliate-panel{background:linear-gradient(135deg,#1a0e2e,#120a1f);border:1px solid rgba(168,85,247,.3);border-radius:var(--r2);padding:0;overflow:hidden;box-sizing:border-box;width:100%}
-.affiliate-panel img{width:100%;display:block}
-.affiliate-panel .aff-body{padding:16px 18px}
+/* VENTRAIP AFFILIATE PANEL — full-width horizontal banner, sits below the
+   wheel+sidebar grid rather than squeezed into the 380px sidebar column */
+.affiliate-panel-wrap{max-width:1100px;margin:0 auto;padding:0 20px 40px}
+.affiliate-panel{background:linear-gradient(135deg,#1a0e2e,#120a1f);border:1px solid rgba(168,85,247,.3);border-radius:var(--r2);padding:0;overflow:hidden;box-sizing:border-box;width:100%;display:flex;align-items:stretch}
+.affiliate-panel .aff-img-link{flex:0 0 300px;display:block}
+.affiliate-panel img{width:100%;height:100%;object-fit:cover;display:block}
+.affiliate-panel .aff-body{flex:1;padding:22px 28px;display:flex;flex-direction:column;justify-content:center}
 .affiliate-panel .aff-tag{font-family:var(--ffm);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--subtle);margin-bottom:6px}
-.affiliate-panel h4{font-family:var(--ffd);font-size:15px;color:#fff;margin-bottom:6px}
-.affiliate-panel p{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5}
-.affiliate-panel .aff-btn{display:block;text-align:center;background:linear-gradient(135deg,#c026d3,#7c3aed);color:#fff;font-weight:800;font-size:13px;padding:10px;border-radius:10px;transition:opacity .2s}
+.affiliate-panel h4{font-family:var(--ffd);font-size:18px;color:#fff;margin-bottom:6px}
+.affiliate-panel p{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;max-width:480px}
+.affiliate-panel .aff-btn{display:inline-block;text-align:center;background:linear-gradient(135deg,#c026d3,#7c3aed);color:#fff;font-weight:800;font-size:13px;padding:10px 22px;border-radius:10px;transition:opacity .2s}
 .affiliate-panel .aff-btn:hover{opacity:.88}
+@media(max-width:700px){
+  .affiliate-panel{flex-direction:column}
+  .affiliate-panel .aff-img-link{flex:none}
+  .affiliate-panel img{aspect-ratio:3/2;object-fit:cover}
+  .affiliate-panel .aff-body{padding:16px 18px}
+  .affiliate-panel p{max-width:none}
+}
 
 /* CONFETTI */
 .confetti-piece{position:fixed;width:10px;height:10px;border-radius:2px;pointer-events:none;z-index:9999;animation:confetti-fall 3s ease forwards}
@@ -510,19 +520,24 @@ footer{background:var(--surf);border-top:1px solid rgba(240,192,64,.15);padding:
       </div>
     </div>
 
-    <!-- VENTRAIP AFFILIATE PANEL -->
-    <div class="affiliate-panel">
-      <a href="https://ventraip.com.au/affiliate/uJmhYi4h" target="_blank" rel="sponsored noopener">
-        <img src="/assets/perf/ventraip-banner.webp" alt="VentraIP Australia — Aussie web hosting"/ loading="lazy" decoding="async">
-      </a>
-      <div class="aff-body">
-        <div class="aff-tag">Sponsored</div>
-        <h4>Launch Your Own Site With Aussie Hosting</h4>
-        <p>VentraIP — fast, secure hosting, cheap domains and local Aussie support. 100% Australian owned and operated.</p>
-        <a class="aff-btn" href="https://ventraip.com.au/affiliate/uJmhYi4h" target="_blank" rel="sponsored noopener">Get Started Today →</a>
-      </div>
-    </div>
+  </div>
+</div>
 
+<!-- VENTRAIP AFFILIATE PANEL: moved out of the narrow 380px sidebar column
+     (where it sat squeezed under a shorter stack than the wheel column,
+     leaving an odd gap) — now a full-width banner below the whole
+     wheel+sidebar grid, matching the page's 1100px content width. -->
+<div class="affiliate-panel-wrap">
+  <div class="affiliate-panel">
+    <a href="https://ventraip.com.au/affiliate/uJmhYi4h" target="_blank" rel="sponsored noopener" class="aff-img-link">
+      <img src="/assets/perf/ventraip-banner.webp" alt="VentraIP Australia — Aussie web hosting" loading="lazy" decoding="async">
+    </a>
+    <div class="aff-body">
+      <div class="aff-tag">Sponsored</div>
+      <h4>Launch Your Own Site With Aussie Hosting</h4>
+      <p>VentraIP — fast, secure hosting, cheap domains and local Aussie support. 100% Australian owned and operated.</p>
+      <a class="aff-btn" href="https://ventraip.com.au/affiliate/uJmhYi4h" target="_blank" rel="sponsored noopener">Get Started Today →</a>
+    </div>
   </div>
 </div>
 
