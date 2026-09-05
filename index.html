@@ -168,8 +168,8 @@ nav{position:sticky;top:0;z-index:100;background:rgba(10,10,18,.95);backdrop-fil
 /* WHEEL CONTAINER */
 .wheel-wrap{background:var(--surf);border:1px solid rgba(240,192,64,.15);border-radius:var(--r2);padding:32px;text-align:center;position:relative}
 .wheel-title{font-family:var(--ffd);font-size:22px;margin-bottom:20px;color:var(--gold)}
-.canvas-wrap{position:relative;display:inline-block;margin-bottom:24px}
-#wheelCanvas{border-radius:50%;display:block;filter:drop-shadow(0 0 30px rgba(240,192,64,.2));transition:filter .3s}
+.canvas-wrap{position:relative;display:block;width:100%;max-width:400px;margin:0 auto 24px}
+#wheelCanvas{border-radius:50%;display:block;filter:drop-shadow(0 0 30px rgba(240,192,64,.2));transition:filter .3s;max-width:100%;height:auto}
 #wheelCanvas.spinning{filter:drop-shadow(0 0 50px rgba(240,192,64,.45))}
 .wheel-pointer{position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:28px solid var(--gold);filter:drop-shadow(0 0 8px rgba(240,192,64,.6));z-index:10}
 .spin-btn{display:inline-flex;align-items:center;gap:10px;padding:16px 44px;border-radius:14px;font-family:var(--ffd);font-size:22px;background:linear-gradient(135deg,var(--gold),#c87c00,var(--gold));background-size:200%;color:#0a0a12;border:none;cursor:pointer;transition:all .3s;box-shadow:0 8px 32px rgba(240,192,64,.3);animation:shimmer 3s ease infinite}
