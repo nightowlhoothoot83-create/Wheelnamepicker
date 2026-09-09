@@ -1,3 +1,4 @@
+// Regression guard for homepage Organization JSON-LD repair.
 import fs from 'node:fs';
 
 const wrapper = fs.readFileSync('_worker.js', 'utf8');
