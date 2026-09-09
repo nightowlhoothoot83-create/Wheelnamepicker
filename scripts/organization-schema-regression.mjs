@@ -11,7 +11,7 @@ const checks = [
   ['organization logo is absolute', wrapper, source => /https:\/\/wheelnamepicker\.com\.au\/assets\/perf\/ascension-digital\.webp/.test(source)],
   ['publisher stubs collapse to id-only references', wrapper, source => /out\.publisher = \{ "@id": ORG_ID \}/.test(source)],
   ['organization node receives logo', wrapper, source => /out\.logo = \{/.test(source)],
-  ['served homepage receives schema repair', wrapper, source => /repairOrganizationSchema\(await response\.text\(\), url\.pathname\)/.test(source)],
+  ['served homepage receives schema repair', wrapper, source => /html = repairOrganizationSchema\(html, url\.pathname\);/.test(source)],
   ['base worker retains homepage metadata handling', base, source => /function applyHomepageMetadata\(/.test(source)]
 ];
 
