@@ -19,7 +19,8 @@ const valueRoutes=[
   '/guides/random-selection','/guides/classroom-fair-picking','/guides/probability-activities'
 ];
 const sitemap=fs.readFileSync('sitemap.xml','utf8');
-const worker=fs.readFileSync('_worker.js','utf8');
+const worker=fs.readFileSync('worker-base.js','utf8');
+const wrapper=fs.readFileSync('_worker.js','utf8');
 for(const route of valueRoutes){
   const file=route.slice(1);
   if(!fs.existsSync(file)){fail.push(`${file}: expected value-content page missing`);continue;}
@@ -32,14 +33,16 @@ for(const route of valueRoutes){
   const words=text.split(' ').filter(Boolean).length;
   if(words<180)fail.push(`${file}: supporting content too thin (${words} words)`);
 }
-if(!worker.includes('endsWith(".wheelnamepicker.pages.dev")'))fail.push('_worker.js: branch preview host allowance missing');
-if(!worker.includes('ensureAdgDownloadsAllPages'))fail.push('_worker.js: ADG Downloads all-page footer guard missing');
-if(!worker.includes('/assets/perf/logo-adg-downloads.webp'))fail.push('_worker.js: approved ADG Downloads asset missing');
-if(!worker.includes('sanitizeReviewSignals'))fail.push('_worker.js: AdSense review-signal cleanup missing');
-if(!worker.includes('affiliate-panel-wrap'))fail.push('_worker.js: VentraIP review-period removal guard missing');
-if(!worker.includes('url.pathname === "/lucky-dip"'))fail.push('_worker.js: lucky-dip legacy redirect missing');
-if(!worker.includes('injectValueHub'))fail.push('_worker.js: homepage toolkit injection missing');
-if(!worker.includes('X-ADG-Value-Content'))fail.push('_worker.js: value-content response marker missing');
+if(!worker.includes('endsWith(".wheelnamepicker.pages.dev")'))fail.push('worker-base.js: branch preview host allowance missing');
+if(!worker.includes('ensureAdgDownloadsAllPages'))fail.push('worker-base.js: ADG Downloads all-page footer guard missing');
+if(!worker.includes('/assets/perf/logo-adg-downloads.webp'))fail.push('worker-base.js: approved ADG Downloads asset missing');
+if(!worker.includes('sanitizeReviewSignals'))fail.push('worker-base.js: AdSense review-signal cleanup missing');
+if(!worker.includes('affiliate-panel-wrap'))fail.push('worker-base.js: VentraIP review-period removal guard missing');
+if(!worker.includes('url.pathname === "/lucky-dip"'))fail.push('worker-base.js: lucky-dip legacy redirect missing');
+if(!worker.includes('injectValueHub'))fail.push('worker-base.js: homepage toolkit injection missing');
+if(!worker.includes('X-ADG-Value-Content'))fail.push('worker-base.js: value-content response marker missing');
+if(!wrapper.includes('repairOrganizationSchema'))fail.push('_worker.js: Organization schema repair missing');
+if(!wrapper.includes('X-ADG-Structured-Data'))fail.push('_worker.js: structured-data response marker missing');
 const home=fs.readFileSync('index.html','utf8');
 if((home.match(adgLogoPattern)||[]).length!==1)fail.push('index.html: expected exactly one Ascension Digital logo');
 if(!home.includes('55 free online calculators across 7 categories'))fail.push('index.html: MyCalcTools count must remain 55');
