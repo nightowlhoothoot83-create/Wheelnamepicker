@@ -27,7 +27,16 @@ function cleanInternalHref(raw, baseUrl) {
 }
 
 function rewriteInternalLinks(html, pageUrl) {
-  return html.replace(/\bhref=(["'])([^"']+)\1/gi, (match, quote, href) => `href=${quote}${cleanInternalHref(href, pageUrl)}${quote}`);
+  return html.replace(/<a\b[^>]*>/gi, tag => tag.replace(/\bhref=(["'])([^"']+)\1/i, (match, quote, href) => `href=${quote}${cleanInternalHref(href, pageUrl)}${quote}`));
+}
+
+function ensureAbsoluteCanonical(html, pathname) {
+  if (!CLEAN_TOOL_ROUTES.has(pathname) || pathname === "/lucky-dip") return html;
+  const canonical = `https://${CANONICAL_HOST}${pathname}`;
+  if (/<link\b[^>]*rel=["']canonical["'][^>]*>/i.test(html)) {
+    return html.replace(/<link\b[^>]*rel=["']canonical["'][^>]*>/i, `<link rel="canonical" href="${canonical}">`);
+  }
+  return html.replace(/<\/head>/i, `<link rel="canonical" href="${canonical}">\n</head>`);
 }
 
 function repairToolCardTargets(html) {
@@ -122,6 +131,11 @@ function applyHomepageMetadata(html, pathname) {
 }
 
 function sanitizeReviewSignals(html, pathname) {
+  if (pathname === "/about" || pathname === "/about/") {
+    html = html.replace(/The site is supported by Google AdSense advertising/gi, "The site is designed to be supported by advertising so the tools can remain free to use");
+    html = html.replace(/supported by Google AdSense advertising/gi, "designed to be supported by advertising");
+    return html;
+  }
   if (pathname !== "/") return html;
   html = html.replace(/<div\s+class=["']affiliate-panel-wrap["']>[\s\S]*?<a\s+class=["']aff-btn["'][\s\S]*?<\/a>\s*<\/div>\s*<\/div>/i, "");
   html = html.replace(/drinking\s+games\s*\(18\+\)/gi, "tabletop and party games");
@@ -189,6 +203,7 @@ export default {
 
     let html = await response.text();
     html = rewriteInternalLinks(html, url.href);
+    html = ensureAbsoluteCanonical(html, url.pathname);
     html = repairToolCardTargets(html);
     html = applyHomepageMetadata(html, url.pathname);
     html = sanitizeReviewSignals(html, url.pathname);
@@ -201,7 +216,7 @@ export default {
     const headers = new Headers(response.headers);
     headers.delete("content-length");
     headers.set("Content-Type", "text/html; charset=utf-8");
-    headers.set("X-ADG-URL-Hygiene", "wheel-clean-v7");
+    headers.set("X-ADG-URL-Hygiene", "wheel-clean-v8");
     headers.set("X-ADG-Visual-Shell", "wheel-footer-consistent-v9");
     headers.set("X-ADG-Value-Content", "expanded-toolkit-v1");
     return new Response(html, { status: response.status, statusText: response.statusText, headers });
