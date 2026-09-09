@@ -1,10 +1,11 @@
-// Homepage structured-data repair wrapper. Core site behaviour remains in worker-base.js.
+// Final response repair wrapper. Core site behaviour remains in worker-base.js.
 import baseWorker from "./worker-base.js";
 
 const ORG_ID = "https://ascensiondigitalgroup.com/#org";
 const ORG_NAME = "Ascension Digital Group";
 const ORG_URL = "https://ascensiondigitalgroup.com";
 const ORG_LOGO = "https://wheelnamepicker.com.au/assets/perf/ascension-digital.webp";
+const ADG_DOWNLOADS_LOGO = "/assets/perf/logo-adg-downloads.webp";
 
 function repairJsonLdValue(value) {
   if (Array.isArray(value)) return value.map(repairJsonLdValue);
@@ -50,21 +51,34 @@ export function repairOrganizationSchema(html, pathname = "/") {
   );
 }
 
+export function ensureAdgDownloadsFooter(html) {
+  return html.replace(/<footer\b[\s\S]*?<\/footer>/i, footer => {
+    if (/logo-adg-downloads\.webp/i.test(footer)) return footer;
+
+    const block = `<div class="foot-adg-downloads" data-adg-downloads-footer="true" style="display:flex;justify-content:center;align-items:center;margin:18px auto"><a href="https://ascensiondigitalgroup.com" target="_blank" rel="noopener" title="ADG Downloads"><img src="${ADG_DOWNLOADS_LOGO}" alt="ADG Downloads" width="52" height="52" loading="lazy" decoding="async"></a></div>`;
+    return footer.replace(/<\/footer>/i, `${block}</footer>`);
+  });
+}
+
 export default {
   async fetch(request, env, ctx) {
     const response = await baseWorker.fetch(request, env, ctx);
     const url = new URL(request.url);
     const contentType = response.headers.get("content-type") || "";
 
-    if (!response.ok || url.pathname !== "/" || !contentType.includes("text/html")) {
+    if (!response.ok || !contentType.includes("text/html")) {
       return response;
     }
 
-    const html = repairOrganizationSchema(await response.text(), url.pathname);
+    let html = await response.text();
+    html = ensureAdgDownloadsFooter(html);
+    html = repairOrganizationSchema(html, url.pathname);
+
     const headers = new Headers(response.headers);
     headers.delete("content-length");
     headers.set("Content-Type", "text/html; charset=utf-8");
-    headers.set("X-ADG-Structured-Data", "org-schema-v1");
+    headers.set("X-ADG-Footer-Downloads", "enforced-v1");
+    if (url.pathname === "/") headers.set("X-ADG-Structured-Data", "org-schema-v1");
 
     return new Response(html, {
       status: response.status,

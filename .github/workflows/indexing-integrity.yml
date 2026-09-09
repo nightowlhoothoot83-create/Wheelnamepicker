@@ -19,5 +19,7 @@ jobs:
         run: node scripts/canonical-worker-regression.mjs
       - name: Guard Organization schema
         run: node scripts/organization-schema-regression.mjs
+      - name: Guard ADG Downloads footer
+        run: node scripts/footer-downloads-regression.mjs
       - name: Validate indexing and value content
         run: node scripts/validate-indexing-integrity.mjs
