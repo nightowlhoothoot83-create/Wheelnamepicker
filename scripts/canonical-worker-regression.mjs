@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-const worker = fs.readFileSync('_worker.js', 'utf8');
+const worker = fs.readFileSync('worker-base.js', 'utf8');
 
 const checks = [
   ['anchor-only href rewriting', /html\.replace\(\/<a\\b\[\^>\]\*>\/gi/],
