@@ -13,15 +13,39 @@ for(const file of files){
   const adgLogos=(s.match(adgLogoPattern)||[]).length;
   if(adgLogos>1)fail.push(`${file}: duplicate Ascension Digital logo anywhere on page`);
 }
+const valueRoutes=[
+  '/random-number-picker','/student-picker','/team-picker','/chore-picker','/dinner-picker',
+  '/yes-no-picker','/weekday-picker','/colour-picker','/picture-picker','/activity-picker',
+  '/guides/random-selection','/guides/classroom-fair-picking','/guides/probability-activities'
+];
+const sitemap=fs.readFileSync('sitemap.xml','utf8');
 const worker=fs.readFileSync('_worker.js','utf8');
+for(const route of valueRoutes){
+  const file=route.slice(1);
+  if(!fs.existsSync(file)){fail.push(`${file}: expected value-content page missing`);continue;}
+  const s=fs.readFileSync(file,'utf8');
+  const canonical=`https://wheelnamepicker.com.au${route}`;
+  if(!s.includes(`<link rel="canonical" href="${canonical}">`))fail.push(`${file}: canonical mismatch`);
+  if(!sitemap.includes(`<loc>${canonical}</loc>`))fail.push(`${file}: missing from sitemap`);
+  if(!worker.includes(`"${route}"`))fail.push(`${file}: missing from worker clean-route set`);
+  const text=s.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&[a-z#0-9]+;/gi,' ').replace(/\s+/g,' ').trim();
+  const words=text.split(' ').filter(Boolean).length;
+  if(words<180)fail.push(`${file}: supporting content too thin (${words} words)`);
+}
 if(!worker.includes('endsWith(".wheelnamepicker.pages.dev")'))fail.push('_worker.js: branch preview host allowance missing');
 if(!worker.includes('ensureAdgDownloadsAllPages'))fail.push('_worker.js: ADG Downloads all-page footer guard missing');
 if(!worker.includes('/assets/perf/logo-adg-downloads.webp'))fail.push('_worker.js: approved ADG Downloads asset missing');
+if(!worker.includes('sanitizeReviewSignals'))fail.push('_worker.js: AdSense review-signal cleanup missing');
+if(!worker.includes('affiliate-panel-wrap'))fail.push('_worker.js: VentraIP review-period removal guard missing');
+if(!worker.includes('url.pathname === "/lucky-dip"'))fail.push('_worker.js: lucky-dip legacy redirect missing');
+if(!worker.includes('injectValueHub'))fail.push('_worker.js: homepage toolkit injection missing');
+if(!worker.includes('X-ADG-Value-Content'))fail.push('_worker.js: value-content response marker missing');
 const home=fs.readFileSync('index.html','utf8');
 if((home.match(adgLogoPattern)||[]).length!==1)fail.push('index.html: expected exactly one Ascension Digital logo');
 if(!home.includes('55 free online calculators across 7 categories'))fail.push('index.html: MyCalcTools count must remain 55');
 if(/46 free online calculators/i.test(home))fail.push('index.html: stale MyCalcTools count returned');
 if(fs.readFileSync('ads.txt','utf8').trim()!==expected)fail.push('ads.txt: publisher line mismatch');
-if(/<loc>[^<]*\.html/i.test(fs.readFileSync('sitemap.xml','utf8')))fail.push('sitemap.xml: redirected .html URL');
+if(/<loc>[^<]*\.html/i.test(sitemap))fail.push('sitemap.xml: redirected .html URL');
+if(sitemap.includes('<loc>https://wheelnamepicker.com.au/lucky-dip</loc>'))fail.push('sitemap.xml: legacy lucky-dip URL should not be indexed');
 if(fail.length){console.error(fail.join('\n'));process.exit(1)}
-console.log(`Wheel Name Picker integrity passed (${files.length} HTML files)`);
+console.log(`Wheel Name Picker integrity passed (${files.length} HTML files + ${valueRoutes.length} high-value pages)`);
