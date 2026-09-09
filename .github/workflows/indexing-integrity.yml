@@ -11,9 +11,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Check worker syntax
+      - name: Check wrapper syntax
         run: node --input-type=module --check < _worker.js
+      - name: Check base worker syntax
+        run: node --input-type=module --check < worker-base.js
       - name: Guard canonical rewriting
         run: node scripts/canonical-worker-regression.mjs
+      - name: Guard Organization schema
+        run: node scripts/organization-schema-regression.mjs
       - name: Validate indexing and value content
         run: node scripts/validate-indexing-integrity.mjs
