@@ -11,4 +11,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: node scripts/validate-indexing-integrity.mjs
+      - name: Check worker syntax
+        run: node --input-type=module --check < _worker.js
+      - name: Validate indexing and value content
+        run: node scripts/validate-indexing-integrity.mjs
