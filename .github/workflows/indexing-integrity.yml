@@ -13,5 +13,7 @@ jobs:
           node-version: 20
       - name: Check worker syntax
         run: node --input-type=module --check < _worker.js
+      - name: Guard canonical rewriting
+        run: node scripts/canonical-worker-regression.mjs
       - name: Validate indexing and value content
         run: node scripts/validate-indexing-integrity.mjs
