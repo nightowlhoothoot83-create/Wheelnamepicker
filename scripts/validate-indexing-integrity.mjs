@@ -43,6 +43,9 @@ if(!worker.includes('injectValueHub'))fail.push('worker-base.js: homepage toolki
 if(!worker.includes('X-ADG-Value-Content'))fail.push('worker-base.js: value-content response marker missing');
 if(!wrapper.includes('repairOrganizationSchema'))fail.push('_worker.js: Organization schema repair missing');
 if(!wrapper.includes('X-ADG-Structured-Data'))fail.push('_worker.js: structured-data response marker missing');
+if(!wrapper.includes('ensureAdgDownloadsFooter'))fail.push('_worker.js: final ADG Downloads footer enforcement missing');
+if(!wrapper.includes('data-adg-downloads-footer="true"'))fail.push('_worker.js: visible ADG Downloads footer block missing');
+if(!wrapper.includes('X-ADG-Footer-Downloads'))fail.push('_worker.js: footer enforcement response marker missing');
 const home=fs.readFileSync('index.html','utf8');
 if((home.match(adgLogoPattern)||[]).length!==1)fail.push('index.html: expected exactly one Ascension Digital logo');
 if(!home.includes('55 free online calculators across 7 categories'))fail.push('index.html: MyCalcTools count must remain 55');
