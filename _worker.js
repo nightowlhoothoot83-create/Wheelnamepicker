@@ -1,3 +1,4 @@
+// Homepage structured-data repair wrapper. Core site behaviour remains in worker-base.js.
 import baseWorker from "./worker-base.js";
 
 const ORG_ID = "https://ascensiondigitalgroup.com/#org";
