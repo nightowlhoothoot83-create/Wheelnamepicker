@@ -18,6 +18,7 @@ if(!worker.includes('endsWith(".wheelnamepicker.pages.dev")'))fail.push('_worker
 if(!worker.includes('ensureAdgDownloadsAllPages'))fail.push('_worker.js: ADG Downloads all-page footer guard missing');
 if(!worker.includes('/assets/perf/logo-adg-downloads.webp'))fail.push('_worker.js: approved ADG Downloads asset missing');
 const home=fs.readFileSync('index.html','utf8');
+if(!/@media\(max-width:860px\)\{\.main-wrap\{grid-template-columns:minmax\(0,1fr\)\}\.main-wrap>\*\{min-width:0\}\}/.test(home))fail.push('index.html: narrow-mobile grid containment rule missing');
 if((home.match(adgLogoPattern)||[]).length!==1)fail.push('index.html: expected exactly one Ascension Digital logo');
 if(!home.includes('55 free online calculators across 7 categories'))fail.push('index.html: MyCalcTools count must remain 55');
 if(/46 free online calculators/i.test(home))fail.push('index.html: stale MyCalcTools count returned');
