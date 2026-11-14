@@ -37,6 +37,7 @@ if(!worker.includes('endsWith(".wheelnamepicker.pages.dev")'))fail.push('worker-
 if(!worker.includes('ensureAdgDownloadsAllPages'))fail.push('worker-base.js: ADG Downloads all-page footer guard missing');
 if(!worker.includes('/assets/perf/logo-adg-downloads.webp'))fail.push('worker-base.js: approved ADG Downloads asset missing');
 if(!worker.includes('sanitizeReviewSignals'))fail.push('worker-base.js: AdSense review-signal cleanup missing');
+if(/replace\(\/\\b(?:lotto)\\b\/gi,\s*["']random number["']\)/i.test(worker))fail.push('worker-base.js: global lotto replacement corrupts live copy');
 if(!worker.includes('affiliate-panel-wrap'))fail.push('worker-base.js: VentraIP review-period removal guard missing');
 if(!worker.includes('url.pathname === "/lucky-dip"'))fail.push('worker-base.js: lucky-dip legacy redirect missing');
 if(!worker.includes('injectValueHub'))fail.push('worker-base.js: homepage toolkit injection missing');
@@ -47,6 +48,8 @@ if(!wrapper.includes('ensureAdgDownloadsFooter'))fail.push('_worker.js: final AD
 if(!wrapper.includes('data-adg-downloads-footer="true"'))fail.push('_worker.js: visible ADG Downloads footer block missing');
 if(!wrapper.includes('X-ADG-Footer-Downloads'))fail.push('_worker.js: footer enforcement response marker missing');
 const home=fs.readFileSync('index.html','utf8');
+if(/random random|number number|random number numbers/i.test(home))fail.push('index.html: duplicated random-number wording');
+if(/perfect for competitions|perfect for.*raffles/i.test(home))fail.push('index.html: formal-draw claim conflicts with safety guidance');
 if((home.match(adgLogoPattern)||[]).length!==1)fail.push('index.html: expected exactly one Ascension Digital logo');
 if(!home.includes('55 free online calculators across 7 categories'))fail.push('index.html: MyCalcTools count must remain 55');
 if(/46 free online calculators/i.test(home))fail.push('index.html: stale MyCalcTools count returned');
