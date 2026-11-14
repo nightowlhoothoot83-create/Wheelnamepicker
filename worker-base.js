@@ -144,7 +144,10 @@ function sanitizeReviewSignals(html, pathname) {
   html = html.replace(/Can I use this for competitions and prize draws\?/gi, "Can I use this for informal group selections?");
   html = html.replace(/Absolutely\. Add all participant names, spin to pick a winner\. Each entry has an equal and fair chance of being selected, making it ideal for giveaways, raffles and competitions\./gi, "For informal classroom, family and community activities, you can add the eligible options and select one at random. For regulated, audited or legally significant selections, use a process that meets the applicable rules and record-keeping requirements.");
   html = html.replace(/Lucky Dip/gi, "Random Number Picker");
-  html = html.replace(/\blotto\b/gi, "random number");
+  // Do not globally replace the word "lotto". That corrupts phrases such as
+  // "random lotto numbers" into "random random number numbers" and changes
+  // unrelated editorial copy. The targeted replacements above handle the
+  // legacy labels that actually need normalising.
   html = html.replace(/\braffles?\b/gi, "informal selections");
   html = html.replace(/\bprize\s+draws?\b/gi, "group selections");
   html = html.replace(/\bgiveaways?\b/gi, "group activities");
