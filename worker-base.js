@@ -111,11 +111,15 @@ function ensureAdgDownloadsAllPages(html) {
 }
 
 function ensureApprovedFooter(html) {
-  if (/<footer\b/i.test(html)) return html;
   const block = `<div class="foot-adg-header" data-adg-approved-footer="true" style="text-align:center;margin:0 auto 24px">
 <a href="https://ascensiondigitalgroup.com" target="_blank" rel="noopener"><img src="${APPROVED_ADG_LOGO}" alt="Ascension Digital Group" class="foot-adg-logo" width="440" height="440" loading="lazy" decoding="async"></a>
 <p class="foot-adg-tagline">Part of the Ascension Digital Group ecosystem</p>
 </div>`;
+  const footer = html.match(/<footer\b[\s\S]*?<\/footer>/i);
+  if (footer) {
+    if (/class=["'][^"']*foot-adg-logo/i.test(footer[0])) return html;
+    return html.replace(/<footer\b[^>]*>/i, opening => `${opening}${block}`);
+  }
   return html.replace(/<\/body>/i, `<footer class="adg-generated-footer">${block}<p>© 2026 wheelnamepicker.com.au · Part of Ascension Digital Group</p></footer>\n</body>`);
 }
 
@@ -148,9 +152,6 @@ function sanitizeReviewSignals(html, pathname) {
   // "random lotto numbers" into "random random number numbers" and changes
   // unrelated editorial copy. The targeted replacements above handle the
   // legacy labels that actually need normalising.
-  html = html.replace(/\braffles?\b/gi, "informal selections");
-  html = html.replace(/\bprize\s+draws?\b/gi, "group selections");
-  html = html.replace(/\bgiveaways?\b/gi, "group activities");
   return html;
 }
 
@@ -158,7 +159,7 @@ function injectValueHub(html, pathname) {
   if (pathname !== "/" || /id=["']value-toolkit["']/i.test(html)) return html;
   const block = `<section id="value-toolkit" style="max-width:1100px;margin:0 auto;padding:42px 20px">
 <style>#value-toolkit h2{text-align:center;font-size:clamp(26px,4vw,38px);margin:0 0 8px}#value-toolkit>p{text-align:center;color:#aaa6c7;max-width:760px;margin:0 auto 22px}.value-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.value-card{display:block;background:linear-gradient(145deg,rgba(26,26,46,.96),rgba(18,18,30,.96));border:1px solid rgba(0,212,232,.25);border-radius:15px;padding:17px;color:#f0eeff}.value-card:hover{border-color:rgba(240,192,64,.55);transform:translateY(-2px)}.value-card strong{display:block;color:#fff;margin-bottom:5px}.value-card span{color:#aaa6c7;font-size:.9rem}</style>
-<h2>More free choice tools</h2><p>Different decisions need different tools. These pages are built for specific tasks rather than re-skinning the same wheel.</p><div class="value-grid">
+<h2>More free choice tools</h2><p>Choose a tool for your task: pick students without repeats, shuffle teams, select a number range, or choose from your own meals, chores and activities.</p><div class="value-grid">
 <a class="value-card" href="/random-number-picker"><strong>Random Number Picker</strong><span>Choose one or more numbers from your own range, with optional no-repeat results.</span></a>
 <a class="value-card" href="/student-picker"><strong>Student Picker</strong><span>Paste a class list, pick one name and optionally remove selected students.</span></a>
 <a class="value-card" href="/team-picker"><strong>Team Picker</strong><span>Shuffle names into roughly balanced random groups.</span></a>
@@ -225,3 +226,4 @@ export default {
     return new Response(html, { status: response.status, statusText: response.statusText, headers });
   }
 };
+
