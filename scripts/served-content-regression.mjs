@@ -11,7 +11,7 @@ for(const [route,file] of routes){
   assert.equal(response.status,200);
   const output=await response.text();
   const copy=visible(output);
-  assert.doesNotMatch(copy,/AdSense|formal informal selections|regulated informal selections|re-skinning|random random number/i,route);
+  assert.doesNotMatch(copy,/AdSense|formal informal selections|regulated informal selections|re-skinning|random random number|advertising advertising|site is supported by Google/i,route);
   assert.match(output,/assets\/perf\/ascension-digital\.webp/,route);
   assert.match(output,/assets\/perf\/logo-adg-downloads\.webp/,route);
   if(route==='/'){
@@ -21,7 +21,7 @@ for(const [route,file] of routes){
   }
   if(route==='/privacy'){
     assert.match(copy,/current page's memory/);
-    assert.match(copy,/not a claim of advertising approval/);
+    assert.match(copy,/If Google advertising is enabled and you accept optional cookies/);
     assert.doesNotMatch(copy,/publisher ID|no personal data at risk|stored only in your browser's local storage/i);
   }
   if(route==='/cookies')assert.match(copy,/local storage does not automatically clear when a tab closes/);
