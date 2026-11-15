@@ -23,3 +23,6 @@ jobs:
         run: node scripts/footer-downloads-regression.mjs
       - name: Validate indexing and value content
         run: node scripts/validate-indexing-integrity.mjs
+      - name: Verify served wording and privacy descriptions
+        run: node scripts/served-content-regression.mjs
+

@@ -457,7 +457,7 @@ footer{background:var(--surf);border-top:1px solid rgba(240,192,64,.15);padding:
 </style>
 <div id="cookie-consent-banner" class="cookie-consent-banner">
   <div class="cookie-consent-inner">
-    <p>We use cookies for basic site functionality and to show ads via Google AdSense. Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this or other websites. See our <a href="/cookies">Cookie Policy</a> for details.</p>
+    <p>Optional advertising, if enabled and accepted, may use cookies from third-party vendors including Google. The choice tools work without optional advertising cookies. See our <a href="/cookies">Cookie Policy</a> for details.</p>
     <div class="cookie-consent-actions">
       <button class="cc-decline" onclick="ccDecline()">Decline</button>
       <button class="cc-accept" onclick="ccAccept()">Accept</button>
